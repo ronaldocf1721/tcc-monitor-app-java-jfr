@@ -1,0 +1,127 @@
+/*
+Sintaxe básica para número aleatório inteiro entre dois valores: FLOOR(random() * (max - min + 1)) + min
+
+-----------------
+MIN MAX NATUREZA
+1	413	1 - ATIVO
+414	576	2 - PASSIVO
+577	622	3 - PATRIMONIO
+623	960	4 - RESULTADO
+-----------------
+*/
+--lancamentos ativo e passivo
+DO $$
+DECLARE
+    i INTEGER;
+    QTD_REG INTEGER;
+    QTD_REG_MES INTEGER;
+    COUNT_QTD_REG_MES INTEGER;
+	NUM_LCTO INTEGER;
+	DT_LCTO DATE;
+	VL_LCTO NUMERIC;
+	COD_CTA_DEBITO INTEGER;
+	COD_CTA_CREDITO INTEGER;
+	COD_EMP INTEGER;
+	MES_CORRENTE INTEGER;
+BEGIN
+	QTD_REG = 60000;
+	QTD_REG_MES = QTD_REG / 12;
+	MES_CORRENTE = 1;
+	COUNT_QTD_REG_MES = 0;
+	NUM_LCTO = 0;
+    FOR i IN 1..QTD_REG LOOP
+		IF (COUNT_QTD_REG_MES >= QTD_REG_MES AND MES_CORRENTE <> 12) THEN
+			MES_CORRENTE = MES_CORRENTE + 1;
+			COUNT_QTD_REG_MES = 0;
+			NUM_LCTO = 0;
+		END IF;
+		
+		COUNT_QTD_REG_MES = COUNT_QTD_REG_MES + 1;
+		NUM_LCTO = NUM_LCTO + 1;
+		DT_LCTO = (TO_DATE('2024-' || LPAD(MES_CORRENTE::text, 2, '0') || '-01', 'YYYY-MM-DD') + (FLOOR(random() * 28)::int) * INTERVAL '1 day')::date;
+		VL_LCTO = ROUND((RANDOM() * 1000 + 100)::numeric, 2);
+		COD_CTA_DEBITO = FLOOR(random() * (413 - 1 + 1)) + 1;
+		COD_CTA_CREDITO = FLOOR(random() * (576 - 414 + 1)) + 414;
+		COD_EMP = FLOOR(random() * (3 - 1 + 1)) + 1;
+		
+        INSERT INTO LANC_CONTABEIS (NUM_LCTO, DT_LCTO, VL_LCTO, COD_CTA, IND_DC, COD_EMP)
+        VALUES (
+			NUM_LCTO,
+			DT_LCTO,
+			VL_LCTO,
+			COD_CTA_DEBITO,
+			'D',
+			COD_EMP
+        );
+		
+        INSERT INTO LANC_CONTABEIS (NUM_LCTO, DT_LCTO, VL_LCTO, COD_CTA, IND_DC, COD_EMP)
+        VALUES (
+			NUM_LCTO,
+			DT_LCTO,
+			VL_LCTO,
+			COD_CTA_CREDITO,
+			'C',
+			COD_EMP
+        );
+    END LOOP;
+END;
+$$ LANGUAGE plpgsql;
+
+
+--lancamentos patrimonio e resultado
+DO $$
+DECLARE
+    i INTEGER;
+    QTD_REG INTEGER;
+    QTD_REG_MES INTEGER;
+    COUNT_QTD_REG_MES INTEGER;
+	NUM_LCTO INTEGER;
+	DT_LCTO DATE;
+	VL_LCTO NUMERIC;
+	COD_CTA_DEBITO INTEGER;
+	COD_CTA_CREDITO INTEGER;
+	COD_EMP INTEGER;
+	MES_CORRENTE INTEGER;
+BEGIN
+	QTD_REG = 60000;
+	QTD_REG_MES = QTD_REG / 12;
+	MES_CORRENTE = 1;
+	COUNT_QTD_REG_MES = 0;
+	NUM_LCTO = 0;
+    FOR i IN 1..QTD_REG LOOP
+		IF (COUNT_QTD_REG_MES >= QTD_REG_MES AND MES_CORRENTE <> 12) THEN
+			MES_CORRENTE = MES_CORRENTE + 1;
+			COUNT_QTD_REG_MES = 0;
+			NUM_LCTO = 0;
+		END IF;
+
+		COUNT_QTD_REG_MES = COUNT_QTD_REG_MES + 1;
+		NUM_LCTO = NUM_LCTO + 1;
+		DT_LCTO = (TO_DATE('2024-' || LPAD(MES_CORRENTE::text, 2, '0') || '-01', 'YYYY-MM-DD') + (FLOOR(random() * 28)::int) * INTERVAL '1 day')::date;
+		VL_LCTO = ROUND((RANDOM() * 1000 + 100)::numeric, 2);
+		COD_CTA_DEBITO = FLOOR(random() * (622 - 577 + 1)) + 577;
+		COD_CTA_CREDITO = FLOOR(random() * (960 - 623 + 1)) + 623;
+		COD_EMP = FLOOR(random() * (3 - 1 + 1)) + 1;
+
+        INSERT INTO LANC_CONTABEIS (NUM_LCTO, DT_LCTO, VL_LCTO, COD_CTA, IND_DC, COD_EMP)
+        VALUES (
+			NUM_LCTO + QTD_REG_MES,
+			DT_LCTO,
+			VL_LCTO,
+			COD_CTA_DEBITO,
+			'D',
+			COD_EMP
+        );
+
+        INSERT INTO LANC_CONTABEIS (NUM_LCTO, DT_LCTO, VL_LCTO, COD_CTA, IND_DC, COD_EMP)
+        VALUES (
+			NUM_LCTO + QTD_REG_MES,
+			DT_LCTO,
+			VL_LCTO,
+			COD_CTA_CREDITO,
+			'C',
+			COD_EMP
+        );
+    END LOOP;
+END;
+$$ LANGUAGE plpgsql;

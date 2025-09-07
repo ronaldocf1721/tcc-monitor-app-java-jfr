@@ -95,7 +95,7 @@ java -XX:StartFlightRecording=duration=1h,filename=./jfr/app_recording.jfr,name=
 
 ---
 
-## 🔗 Endpoints da API (corrigidos)
+## 🔗 Endpoints da API
 
 Base path do recurso: **`/arquivos-ecd`**
 
